@@ -1,7 +1,9 @@
 package at.davl.spring.dao;
 import at.davl.spring.models.Person;
+import org.postgresql.Driver;
 import org.springframework.stereotype.Component;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,27 +11,69 @@ import java.util.List;
 @Component
 public class PersonDAO {
     private static int PEOPLE_COUNT; // 0
-    private List<Person> people;
+    private static final String URL = "jdbc:postgresql://localhost:5432/first_db";
+    private static final String USERNAME = "nexoc";
+    private static final String PASSWORD = "081180";
 
-    {
-        people = new ArrayList<>();
-        people.add(new Person(++PEOPLE_COUNT, "Tom", 20, "marat@mail.com"));
-        people.add(new Person(++PEOPLE_COUNT, "Mike", 23,"mart@mail.com"));
-        people.add(new Person(++PEOPLE_COUNT, "Bob", 34,"marat@mil.com"));
-        people.add(new Person(++PEOPLE_COUNT, "Katy", 56,"mrat@mail.com"));
+    private static Connection connection;
+
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
     public List<Person> index() {
+        List<Person> people = new ArrayList<>();
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = "SELECT * FROM PERSON";
+            ResultSet resultSet =  statement.executeQuery(SQL);
+
+            while (resultSet.next()) {
+                Person person = new Person();
+
+                person.setId(resultSet.getInt("id"));
+                person.setName(resultSet.getString("name"));
+                person.setAge(resultSet.getInt("age"));
+                person.setEmail(resultSet.getString("email"));
+
+                people.add(person);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return people;
     }
 
-    public Person show(int id) {
-        return people.stream().filter(person ->
-                person.getId() == id).findAny().orElse(null);
+    public void save(Person person) {
+        //person.setId(++PEOPLE_COUNT);
+        //people.add(person);
+
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = "INSERT INTO Person VALUES(" + ++PEOPLE_COUNT + ",'"
+                    + person.getName() + "', "
+                    + person.getAge() + ",'"
+                    + person.getEmail() + "');";
+
+            statement.executeUpdate(SQL);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void save(Person person) {
-        person.setId(++PEOPLE_COUNT);
-        people.add(person);
+
+    public Person show(int id) {
+        return null; //people.stream().filter(person -> person.getId() == id).findAny().orElse(null);
     }
 
     public void update(int id, Person updatedPerson){
@@ -41,6 +85,8 @@ public class PersonDAO {
 
     public void delete(int id) {
         System.out.println("method delete DAO");
-        people.removeIf(p -> p.getId() == id);
+        //people.removeIf(p -> p.getId() == id);
     }
+
+
 }
