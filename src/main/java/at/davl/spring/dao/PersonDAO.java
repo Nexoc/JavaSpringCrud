@@ -73,7 +73,7 @@ public class PersonDAO {
 
     public void save(Person person) {
 
-        jdbcTemplate.update("INSERT INTO Person Values(1, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO Person(name, age, email) Values(?, ?, ?)",
                 person.getName(), person.getAge(), person.getEmail());
 
         //person.setId(++PEOPLE_COUNT);
