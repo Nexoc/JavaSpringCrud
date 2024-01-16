@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -97,6 +98,14 @@ public class PersonDAO {
             throw new RuntimeException(e);
         }
              */
+    }
+
+
+    public Optional<Person> show(String email) {
+        return jdbcTemplate.query("SELECT * FROM Person WHERE email=?",
+                new Object[] {email},
+                new BeanPropertyRowMapper<>(Person.class))
+                .stream().findAny();
     }
 
 
