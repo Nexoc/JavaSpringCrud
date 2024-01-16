@@ -74,8 +74,8 @@ public class PersonDAO {
 
     public void save(Person person) {
 
-        jdbcTemplate.update("INSERT INTO Person(name, age, email) Values(?, ?, ?)",
-                person.getName(), person.getAge(), person.getEmail());
+        jdbcTemplate.update("INSERT INTO Person(name, age, email, address) Values(?, ?, ?, ?)",
+                person.getName(), person.getAge(), person.getEmail(), person.getAddress());
 
 
         //person.setId(++PEOPLE_COUNT);
@@ -141,8 +141,8 @@ public class PersonDAO {
     }
 
     public void update(int id, Person updatedPerson){
-        jdbcTemplate.update("UPDATE Person SET name=?, age=?, email=? WHERE id=?",
-                updatedPerson.getName(), updatedPerson.getAge(), updatedPerson.getEmail(), id) ;
+        jdbcTemplate.update("UPDATE Person SET name=?, age=?, email=?, address=? WHERE id=?",
+                updatedPerson.getName(), updatedPerson.getAge(), updatedPerson.getEmail(), updatedPerson.getAddress(), id) ;
         /*
         Person personToBeUpdated = show(id);
         personToBeUpdated.setName(updatedPerson.getName());
@@ -228,7 +228,7 @@ public class PersonDAO {
         List<Person> people = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             people.add(new Person(
-                    i, "Name " + i, 30, "test"+i+"mail.ru"));
+                    i, "Name " + i, 30, "test"+i+"mail.ru", "some address"));
         }
         return people;
     }
